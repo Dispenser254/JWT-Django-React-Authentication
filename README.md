@@ -1,4 +1,4 @@
-# JWT-Django-React-Authention
+# JWT-Django-React-Authentication
 
 This repository accompanies the tutorial on how to use **JWT Authentication with Django and React**. If you're building a project where React serves as the frontend and Django Rest Framework (DRF) powers the backend, this tutorial will guide you through setting up user authentication using JSON Web Tokens (JWT).
 

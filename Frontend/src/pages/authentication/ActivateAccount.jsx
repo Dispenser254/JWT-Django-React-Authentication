@@ -1,8 +1,45 @@
 // import React from 'react'
 
 import { Button } from "flowbite-react"
+import { activate, reset } from "../../features/auth/authSlicer";
+import { useEffect } from "react";
+import { toast } from "react-toastify";
+import { useNavigate, useParams } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import CustomSpinner from "../../components/Spinner";
 
 const ActivateAccountPage = () => {
+
+  const { uid, token} = useParams()
+  const navigate = useNavigate()
+  const dispatch = useDispatch()
+
+  const { isError, isLoading, isSuccess, message } = useSelector(
+    (state) => state.auth
+  );
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+
+    const userData = {
+      uid,
+      token,
+    };
+    dispatch(activate(userData));
+  };
+
+  useEffect(() => {
+    if (isError) {
+      toast.error(message);
+    }
+
+    if (isSuccess) {
+      navigate("/login");
+      toast.success("Your account has been activated! You can login now");
+    }
+    dispatch(reset());
+  }, [isError, isSuccess, navigate, message, dispatch]);
+
   return (
     <section className="absolute w-full h-full">
       <div
@@ -21,9 +58,10 @@ const ActivateAccountPage = () => {
                 <h1 className="my-3 text-2xl font-bold dark:text-white md:text-3xl text-center">
                   Activate Account
                 </h1>
+                {isLoading && <CustomSpinner/>}
                 <form>
                   <div className="mb-6 flex items-center justify-center">
-                    <Button type="submit" className="w-full lg:w-auto">
+                    <Button type="submit" className="w-full lg:w-auto" onClick={handleSubmit}>
                       Activate account
                     </Button>
                   </div>

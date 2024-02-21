@@ -1,7 +1,54 @@
 import { Button, Label, TextInput } from 'flowbite-react';
-// import React from 'react'
+import { useEffect, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
+import { resetPassword, reset } from '../../features/auth/authSlicer';
+import CustomSpinner from '../../components/Spinner';
 
 const ResetPasswordPage = () => {
+
+  const [formData, setFormData] = useState({
+    email: "",
+  });
+
+  const { email } = formData;
+
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+
+  const { isError, isLoading, isSuccess, message } = useSelector(
+    (state) => state.auth
+  );
+
+  const handleChange = (e) => {
+    setFormData((prev) => ({
+      ...prev,
+      [e.target.name]: e.target.value,
+    }));
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+
+    const userData = {
+      email,
+    };
+    dispatch(resetPassword(userData));
+  };
+
+  useEffect(() => {
+    if (isError) {
+      toast.error(message);
+    }
+
+    if (isSuccess) {
+      navigate("/login");
+      toast.success("A reset password email has been sent to you.");
+    }
+    dispatch(reset());
+  }, [isError, isSuccess, navigate, message, dispatch]);
+
   return (
     <section className="absolute w-full h-full">
       <div
@@ -20,6 +67,7 @@ const ResetPasswordPage = () => {
                 <h1 className="my-3 text-2xl font-bold dark:text-white md:text-3xl text-center">
                   Reset password
                 </h1>
+                {isLoading && <CustomSpinner/>}
                 <form>
                   <div className="mb-4 flex flex-col gap-y-3">
                     <Label htmlFor="email">Your email</Label>
@@ -28,10 +76,13 @@ const ResetPasswordPage = () => {
                       name="email"
                       placeholder="name@company.com"
                       type="email"
+                      onChange={handleChange}
+                      value={email}
+                      required
                     />
                   </div>
                   <div className="mb-6">
-                    <Button type="submit" className="w-full lg:w-auto">
+                    <Button type="submit" className="w-full lg:w-auto" onClick={handleSubmit}>
                       Reset password
                     </Button>
                   </div>

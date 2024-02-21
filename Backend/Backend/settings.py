@@ -29,6 +29,11 @@ DEBUG = env("DEBUG")
 
 ALLOWED_HOSTS = []
 
+CORS_ALLOWED_ORIGINS = [
+    "http://127.0.0.1:5173",
+    "http://localhost:5173",
+]
+
 
 # Application definition
 
@@ -39,13 +44,14 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'Accounts',
     
-    # External Apps
+    
     'rest_framework',
     'corsheaders',
-    'djoser',
-    'rest_framework_simplejwt',
+    "djoser",
+    "rest_framework_simplejwt",
+    
+    'Accounts',
 ]
 
 MIDDLEWARE = [
@@ -136,7 +142,7 @@ AUTH_USER_MODEL = 'Accounts.User'
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
-        'rest_framework.authentication.TokenAuthentication',
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
     ),
 }
 

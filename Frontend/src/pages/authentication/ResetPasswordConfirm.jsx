@@ -1,8 +1,60 @@
 // import React from 'react'
 
 import { Button, Label, TextInput } from "flowbite-react";
+import { reset, resetPasswordConfirm } from "../../features/auth/authSlicer";
+import { toast } from "react-toastify";
+import { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { useNavigate, useParams } from "react-router-dom";
+import CustomSpinner from "../../components/Spinner";
 
 const ResetPasswordConfirmPage = () => {
+  const [formData, setFormData] = useState({
+    new_password: "",
+    re_new_password: "",
+  });
+
+  const { uid, token } = useParams();
+  const { new_password, re_new_password } = formData;
+
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+
+  const { isError, isLoading, isSuccess, message } = useSelector(
+    (state) => state.auth
+  );
+
+  const handleChange = (e) => {
+    setFormData((prev) => ({
+      ...prev,
+      [e.target.name]: e.target.value,
+    }));
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+
+    const userData = {
+      uid,
+      token,
+      new_password,
+      re_new_password,
+    };
+    dispatch(resetPasswordConfirm(userData));
+  };
+
+  useEffect(() => {
+    if (isError) {
+      toast.error(message);
+    }
+
+    if (isSuccess) {
+      navigate("/login");
+      toast.success("Your password was reset successfully.");
+    }
+    dispatch(reset());
+  }, [isError, isSuccess, navigate, message, dispatch]);
+
   return (
     <section className="absolute w-full h-full">
       <div
@@ -21,27 +73,38 @@ const ResetPasswordConfirmPage = () => {
                 <h1 className="my-3 text-2xl font-bold dark:text-white md:text-3xl text-center">
                   Reset password
                 </h1>
+                {isLoading && <CustomSpinner />}
                 <form>
                   <div className="mb-6 flex flex-col gap-y-3">
-                    <Label htmlFor="password">Your password</Label>
+                    <Label htmlFor="new_password">Your password</Label>
                     <TextInput
-                      id="password"
-                      name="password"
+                      id="new_password"
+                      name="new_password"
                       placeholder="••••••••"
                       type="password"
+                      onChange={handleChange}
+                      value={new_password}
+                      required
                     />
                   </div>
                   <div className="mb-6 flex flex-col gap-y-3">
-                    <Label htmlFor="re_password">Confirm password</Label>
+                    <Label htmlFor="re_new_password">Confirm password</Label>
                     <TextInput
-                      id="re_password"
-                      name="re_password"
+                      id="re_new_password"
+                      name="re_new_password"
                       placeholder="••••••••"
                       type="password"
+                      onChange={handleChange}
+                      value={re_new_password}
+                      required
                     />
                   </div>
                   <div className="mb-6">
-                    <Button type="submit" className="w-full lg:w-auto">
+                    <Button
+                      type="submit"
+                      className="w-full lg:w-auto"
+                      onClick={handleSubmit}
+                    >
                       Reset password
                     </Button>
                   </div>
@@ -53,6 +116,6 @@ const ResetPasswordConfirmPage = () => {
       </div>
     </section>
   );
-}
+};
 
-export default ResetPasswordConfirmPage
+export default ResetPasswordConfirmPage;

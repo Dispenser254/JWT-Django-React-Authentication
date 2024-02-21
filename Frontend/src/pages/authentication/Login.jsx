@@ -1,8 +1,58 @@
 // import React from 'react'
 
 import { Button, Checkbox, Label, TextInput } from "flowbite-react";
+import { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
+import { getUserInfo, login, reset } from "../../features/auth/authSlicer";
+import { toast } from "react-toastify";
+import CustomSpinner from "../../components/Spinner";
 
 export const LoginPage = () => {
+  const [formData, setFormData] = useState({
+    email: "",
+    password: "",
+  });
+
+  const { email, password } = formData;
+
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+
+  const { isError, isLoading, isSuccess, message } = useSelector(
+    (state) => state.auth
+  );
+
+  const handleChange = (e) => {
+    setFormData((prev) => ({
+      ...prev,
+      [e.target.name]: e.target.value,
+    }));
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+
+    const userData = {
+      email,
+      password,
+    };
+    dispatch(login(userData));
+  };
+
+  useEffect(() => {
+    if (isError) {
+      toast.error(message);
+    }
+
+    if (isSuccess) {
+      navigate("/dashboard");
+      toast.success("Login successfull");
+    }
+    dispatch(reset());
+    dispatch(getUserInfo());
+  }, [isError, isSuccess, navigate, message, dispatch]);
+
   return (
     <section className="absolute w-full h-full">
       <div
@@ -21,6 +71,7 @@ export const LoginPage = () => {
                 <h1 className="my-3 text-2xl font-bold dark:text-white md:text-3xl text-center">
                   Sign in to platform
                 </h1>
+                {isLoading && <CustomSpinner />}
                 <form>
                   <div className="mb-4 flex flex-col gap-y-3">
                     <Label htmlFor="email">Your email</Label>
@@ -29,6 +80,9 @@ export const LoginPage = () => {
                       name="email"
                       placeholder="name@company.com"
                       type="email"
+                      onChange={handleChange}
+                      value={email}
+                      required
                     />
                   </div>
                   <div className="mb-6 flex flex-col gap-y-3">
@@ -38,6 +92,9 @@ export const LoginPage = () => {
                       name="password"
                       placeholder="••••••••"
                       type="password"
+                      onChange={handleChange}
+                      value={password}
+                      required
                     />
                   </div>
                   <div className="mb-6 flex items-center justify-between">
@@ -53,7 +110,11 @@ export const LoginPage = () => {
                     </a>
                   </div>
                   <div className="mb-6">
-                    <Button type="submit" className="w-full lg:w-auto">
+                    <Button
+                      type="submit"
+                      className="w-full lg:w-auto"
+                      onClick={handleSubmit}
+                    >
                       Login to your account
                     </Button>
                   </div>
